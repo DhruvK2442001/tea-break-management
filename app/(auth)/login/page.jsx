@@ -26,7 +26,7 @@ export default function Login() {
   const handlePassword = (e) => {
     setPassword(e.target.value);
   };
-
+  console.log("Hello");
   const handleLogin = async () => {
     const { data: authData, error: authError } =
       await supabase.auth.signInWithPassword({
