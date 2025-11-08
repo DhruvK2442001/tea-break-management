@@ -30,8 +30,8 @@ export default function Login() {
   const handleLogin = async () => {
     const { data: authData, error: authError } =
       await supabase.auth.signInWithPassword({
-        email: "dhruv@hotel.com",
-        password: "Admin@123",
+        email: userName,
+        password: password,
       });
 
     if (authError) {
