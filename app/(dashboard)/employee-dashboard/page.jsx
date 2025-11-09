@@ -42,8 +42,9 @@ export default function EmployeeDashboard() {
         .from("preferences")
         .insert([
           {
-            beverage: choice === "Skip" ? null : choice,
+            beverage: choice === "skip" ? null : choice.toLowerCase(),
             user_id: userId, // match your column name exactly
+            status: "submitted",
             created_at: new Date().toISOString(),
           },
         ]);

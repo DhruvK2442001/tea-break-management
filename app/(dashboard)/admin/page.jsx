@@ -1,58 +1,102 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Download } from "lucide-react";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function Admin() {
-  const summary = {
-    totalEmployees: 35,
-    submittedToday: 32,
-    pending: 3,
-    mostPopular: "Tea",
-    tea: 15,
-    coffee: 12,
-    milk: 5,
-    skipped: 3,
-  };
+  const [employees, setEmployees] = useState([]);
+  const [summary, setSummary] = useState({
+    totalEmployees: 0,
+    submittedToday: 0,
+    pending: 0,
+    mostPopular: "-",
+    tea: 0,
+    coffee: 0,
+    milk: 0,
+    skipped: 0,
+  });
+  const [loading, setLoading] = useState(true);
 
-  const employees = [
-    {
-      name: "Rajesh Kumar",
-      dept: "IT",
-      pref: "Tea",
-      time: "09:15 AM",
-      status: "Submitted",
-    },
-    {
-      name: "Priya Sharma",
-      dept: "HR",
-      pref: "Coffee",
-      time: "09:20 AM",
-      status: "Submitted",
-    },
-    {
-      name: "Amit Patel",
-      dept: "Sales",
-      pref: "Milk",
-      time: "09:18 AM",
-      status: "Submitted",
-    },
-    {
-      name: "Sneha Joshi",
-      dept: "Marketing",
-      pref: "Skip",
-      time: "-",
-      status: "Pending",
-    },
-    {
-      name: "Vikram Singh",
-      dept: "IT",
-      pref: "Tea",
-      time: "09:12 AM",
-      status: "Submitted",
-    },
-  ];
+  // Fetch from Supabase
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
 
+      try {
+        // Fetch all users
+        const { data: users, error: userError } = await supabase
+          .from("users")
+          .select("id, name, department, auth_user_id");
+
+        if (userError) throw userError;
+
+        // Fetch today’s preferences
+        const today = new Date().toISOString().split("T")[0];
+        const { data: prefs, error: prefError } = await supabase
+          .from("preferences")
+          .select("user_id, beverage, status, created_at")
+          .eq("date", today)
+          .eq("status", "submitted");
+
+        console.log("prefs", prefs, "users", users);
+
+        if (prefError) throw prefError;
+
+        // Merge data
+        const merged = users.map((u) => {
+          const pref = prefs.find((p) => p.user_id === u.auth_user_id);
+          return {
+            name: u.name,
+            dept: u.department || "-",
+            pref: pref?.beverage ? pref.beverage : "Skip",
+            time: pref?.created_at
+              ? new Date(pref.created_at).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+              : "-",
+            status: pref?.status || "Pending",
+          };
+        });
+
+        // Compute summary
+        const totalEmployees = users.length;
+        const submitted = prefs.filter((p) => p.status === "submitted").length;
+        const pending = totalEmployees - submitted;
+
+        const beverageCounts = {
+          tea: prefs.filter((p) => p.beverage === "tea").length,
+          coffee: prefs.filter((p) => p.beverage === "coffee").length,
+          milk: prefs.filter((p) => p.beverage === "milk").length,
+          skipped: prefs.filter((p) => p.beverage === "skip").length + pending,
+        };
+
+        const mostPopular = Object.entries(beverageCounts)
+          .filter(([k]) => k !== "skipped")
+          .sort((a, b) => b[1] - a[1])[0]?.[0];
+
+        setEmployees(merged);
+        setSummary({
+          totalEmployees,
+          submittedToday: submitted,
+          pending,
+          mostPopular: mostPopular
+            ? mostPopular.charAt(0).toUpperCase() + mostPopular.slice(1)
+            : "-",
+          ...beverageCounts,
+        });
+      } catch (err) {
+        console.error("Error loading data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // CSV Export
   const handleExport = () => {
     const csvData = [
       ["Name", "Department", "Preference", "Time", "Status"],
@@ -69,6 +113,13 @@ export default function Admin() {
     a.click();
     URL.revokeObjectURL(url);
   };
+
+  if (loading)
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-500">
+        Loading data...
+      </div>
+    );
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
@@ -118,7 +169,7 @@ export default function Admin() {
                 <tr key={i} className="hover:bg-gray-50">
                   <td className="p-2 border">{emp.name}</td>
                   <td className="p-2 border">{emp.dept}</td>
-                  <td className="p-2 border">{emp.pref}</td>
+                  <td className="p-2 border capitalize">{emp.pref}</td>
                   <td className="p-2 border">{emp.time}</td>
                   <td
                     className={`p-2 border font-medium ${

@@ -11,8 +11,9 @@ export default function TeaCard() {
     const fetchData = async () => {
       const { data, error } = await supabase
         .from("preferences")
-        .select("beverage");
-
+        .select("beverage")
+        .eq("date", new Date().toISOString().split("T")[0]);
+      console.log("data", data);
       if (error) {
         console.error("Error fetching beverages:", error);
         return;
