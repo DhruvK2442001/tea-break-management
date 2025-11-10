@@ -26,7 +26,7 @@ export default function Login() {
   const handlePassword = (e) => {
     setPassword(e.target.value);
   };
-  console.log("Hello");
+  console.log("Hello nay");
   const handleLogin = async () => {
     const { data: authData, error: authError } =
       await supabase.auth.signInWithPassword({
@@ -41,7 +41,7 @@ export default function Login() {
 
     // Get the logged in user
     const user = authData.user;
-
+    console.log("logged User", user);
     // Fetch role from users table
     const { data: userData, error: userError } = await supabase
       .from("users")
@@ -54,7 +54,12 @@ export default function Login() {
       return;
     }
 
-    console.log("Logged in as:", user.email, "Role:", userData.role);
+    console.log(
+      "dhruv bhai :",
+      user.email,
+      "dhruv bhai role of user Role:",
+      userData.role
+    );
     setRole(userData.role);
     setUserName(user.email);
     setPassword(user.password);
