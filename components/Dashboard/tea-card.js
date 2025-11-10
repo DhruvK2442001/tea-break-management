@@ -49,7 +49,7 @@ export default function TeaCard() {
             </CardHeader>
             <CardContent>
               <p className="text-2xl font-bold">
-                {summaryData[name.toLowerCase()()] || 0}
+                {summaryData[name.toLowerCase()] || 0}
               </p>
               <p className="text-gray-600">{name}</p>
             </CardContent>
