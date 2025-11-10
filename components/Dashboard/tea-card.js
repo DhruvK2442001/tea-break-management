@@ -48,7 +48,9 @@ export default function TeaCard() {
               <CardTitle className="text-4xl">{icon}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">{summaryData[name] || 0}</p>
+              <p className="text-2xl font-bold">
+                {summaryData[name.toLowerCase()()] || 0}
+              </p>
               <p className="text-gray-600">{name}</p>
             </CardContent>
           </Card>
