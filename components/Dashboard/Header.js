@@ -27,6 +27,13 @@ export default function Header() {
         <span className="text-gray-400">Morning Break Management</span>
       </div>
       <div className="flex w-full justify-end items-center">
+        <Button
+          className={"flex"}
+          variant="outline"
+          onClick={() => router.push("/task-dashboard")}
+        >
+          Task Dashboard
+        </Button>
         <Button className={"flex"} variant="outline" onClick={handleLogout}>
           Logout
         </Button>

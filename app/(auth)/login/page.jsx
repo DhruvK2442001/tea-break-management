@@ -8,6 +8,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { useAuthStore } from "@/store/auth-store";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
+import InstallButton from "@/components/pwa/InstallButton";
 
 export default function Login() {
   const {
@@ -89,6 +90,7 @@ export default function Login() {
           <span className="text-sm text-gray-500">
             Tea & Coffee Management System
           </span>
+          <InstallButton className="mt-1" />
           <Label className="text-sm justify-self-start w-full">Username</Label>
           <Input
             placeholder="Username"

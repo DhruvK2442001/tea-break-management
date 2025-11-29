@@ -1,6 +1,6 @@
 "use client";
 import Header from "@/components/Dashboard/Header";
-import { useAuthStore } from "@/store/auth-store";
+
 export default function DashboardLayout({ children }) {
   return (
     <div className="h-full w-full flex flex-col">
